@@ -1,0 +1,43 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+    env_file:
+      - .env.local
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/myfridge
+    depends_on:
+      db:
+        condition: service_healthy
+    # docker compose up 時: アプリ起動
+    # Dev Container 時: sleep infinity に上書きされる
+    command: >
+      sh -c "npx prisma migrate dev --skip-generate && npm run dev"
+    stdin_open: true
+    tty: true
+
+  db:
+    image: postgres:16-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: myfridge
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:

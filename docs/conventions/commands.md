@@ -79,6 +79,28 @@
 
 ---
 
+## Git hooks（自動 PR 作成）
+
+`git push` すると `develop` への PR が自動作成されます。
+
+### 初回セットアップ（クローン後に一度だけ実行）
+```bash
+git config core.hooksPath .githooks
+chmod +x .githooks/post-push
+```
+
+### 前提条件
+- `gh` CLI のインストールが必要
+  ```powershell
+  winget install GitHub.cli
+  ```
+- インストール後に認証
+  ```bash
+  gh auth login
+  ```
+
+---
+
 ## よく使う npx コマンド
 
 | コマンド | 内容 |
@@ -89,9 +111,29 @@
 
 ---
 
+## Docker
+
+| コマンド | 内容 |
+|---|---|
+| `docker compose up` | 開発環境一式を起動（Node.js + PostgreSQL） |
+| `docker compose up -d` | バックグラウンドで起動 |
+| `docker compose down` | コンテナ停止・削除 |
+| `docker compose down -v` | コンテナ + DB データも削除 |
+| `docker compose logs -f app` | アプリのログを追跡 |
+| `docker compose exec app sh` | アプリコンテナに入る |
+| `docker compose exec db psql -U postgres myfridge` | DB に直接接続 |
+
+---
+
 ## 開発フロー中のコマンド順
 
-### 通常の開発
+### Docker で開発（推奨）
+```bash
+docker compose up    # 全サービス起動（app + db）
+# http://localhost:3000 で開発
+```
+
+### ローカルで開発（Docker なし）
 ```bash
 npm run dev          # サーバー起動
 npm run typecheck    # 型チェック

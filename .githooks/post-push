@@ -1,0 +1,49 @@
+#!/bin/bash
+# post-push hook: develop への PR を自動作成
+
+CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+BASE_BRANCH="develop"
+
+# main / develop は対象外
+if [ "$CURRENT_BRANCH" = "main" ] || [ "$CURRENT_BRANCH" = "develop" ]; then
+  exit 0
+fi
+
+# gh コマンドの確認
+if ! command -v gh &> /dev/null; then
+  echo "⚠️  gh CLI が見つかりません。PR の自動作成をスキップします。"
+  echo "   インストール: winget install GitHub.cli"
+  exit 0
+fi
+
+# 既存 PR の確認
+EXISTING_PR=$(gh pr list --head "$CURRENT_BRANCH" --base "$BASE_BRANCH" --json number --jq '.[0].number' 2>/dev/null)
+
+if [ -n "$EXISTING_PR" ]; then
+  PR_URL=$(gh pr view "$EXISTING_PR" --json url --jq '.url')
+  echo "✅ PR #$EXISTING_PR は既に存在します: $PR_URL"
+  exit 0
+fi
+
+# コミットログからタイトル・本文を生成
+TITLE=$(git log -1 --pretty=%s)
+COMMITS=$(git log "origin/$BASE_BRANCH..HEAD" --pretty="- %s" 2>/dev/null)
+
+echo "🚀 develop への PR を作成中..."
+
+gh pr create \
+  --base "$BASE_BRANCH" \
+  --head "$CURRENT_BRANCH" \
+  --title "$TITLE" \
+  --body "## 概要
+
+$COMMITS
+
+## チェックリスト
+- [ ] 動作確認済み
+- [ ] 型エラーなし (\`npm run typecheck\`)
+- [ ] Lint パス (\`npm run lint\`)
+- [ ] テストパス (\`npm run test\`)
+"
+
+echo "✅ PR を作成しました"
