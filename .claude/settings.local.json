@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__claude_ai_Atlassian__createJiraIssue",
+      "Bash(docker compose:*)",
+      "Bash(rsync -a --exclude='.next' /c/Users/tomo2/OneDrive/my-fridge/ /c/Users/tomo2/projects/my-fridge/)",
+      "Bash(xargs -I{} cp -r {} /c/Users/tomo2/projects/my-fridge/)"
+    ]
+  }
+}
