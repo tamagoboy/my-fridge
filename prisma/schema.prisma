@@ -1,0 +1,109 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─────────────────────────────────────────────
+// 認証テーブル（Google OAuth のみ対応）
+// ─────────────────────────────────────────────
+
+// - セッション管理は JWT 戦略（Cookie）→ Session テーブル不要
+// - Google のみ対応 → Account テーブル不要、googleId を User に直接持つ
+// - メール認証なし → VerificationToken テーブル不要
+model User {
+  id       String  @id @default(cuid())
+  googleId String  @unique // Google の sub フィールド（ユーザー固有 ID）
+  name     String?
+  email    String  @unique
+  image    String? // Google プロフィール画像 URL
+
+  fridgeMember FridgeMember? // 所属する冷蔵庫（1 ユーザー 1 冷蔵庫）
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ─────────────────────────────────────────────
+// 冷蔵庫共有テーブル
+// ─────────────────────────────────────────────
+
+// 冷蔵庫グループ
+// 初回ログイン時に自動作成される
+model Fridge {
+  id   String @id @default(cuid())
+  name String @default("マイ冷蔵庫")
+
+  members     FridgeMember[]
+  foods       Food[]
+  invitations FridgeInvitation[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// 冷蔵庫メンバー（ユーザーと冷蔵庫の紐づけ）
+// @@unique([userId]) で 1 ユーザー 1 冷蔵庫を保証
+// 権限区分なし（全メンバー同等）
+model FridgeMember {
+  id       String @id @default(cuid())
+  userId   String @unique
+  fridgeId String
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fridge Fridge @relation(fields: [fridgeId], references: [id], onDelete: Cascade)
+
+  joinedAt DateTime @default(now())
+
+  @@index([fridgeId])
+}
+
+// 招待リンク管理
+// 冷蔵庫につき同時に有効なリンクは 1 つまで
+// 再発行時は旧リンクを削除して新規作成
+model FridgeInvitation {
+  id        String   @id @default(cuid())
+  fridgeId  String
+  token     String   @unique @default(uuid()) // 招待 URL に含めるトークン
+  expiresAt DateTime // 有効期限（作成から 7 日間）
+
+  fridge Fridge @relation(fields: [fridgeId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+}
+
+// ─────────────────────────────────────────────
+// アプリケーションテーブル
+// ─────────────────────────────────────────────
+
+// 食材テーブル
+// 食材はユーザーではなく冷蔵庫に紐づく
+model Food {
+  id              String    @id @default(cuid())
+  name            String    // 食材名
+  category        String?   // カテゴリ名（野菜/肉/魚/惣菜/乳製品/調味料/その他）
+  quantity        Float     // 数量
+  unit            String    // 単位（個/本/袋/g/ml/パック 等、自由入力）
+  expiryDate      DateTime? // 賞味期限（null = 期限なし）
+  storageLocation String?   // 保管場所: '冷蔵室'|'冷凍室'|'野菜室'|'常温'
+  fridgeId        String
+
+  fridge Fridge @relation(fields: [fridgeId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([fridgeId])
+  @@index([fridgeId, storageLocation])
+  @@index([fridgeId, expiryDate])
+}
+
+// ─────────────────────────────────────────────
+// Phase 3 以降で追加予定
+// ─────────────────────────────────────────────
+// - NormalizationRule: 正規化はバックエンドコードで実装（Step 6）
+// - ProductMaster: 同上
+// - CategoryStorageMapping: Phase 3 で追加
+// - Category: 同上
