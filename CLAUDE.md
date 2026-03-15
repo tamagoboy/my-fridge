@@ -54,6 +54,20 @@
 
 - テストファイルは対象ファイルと同じ命名規則 + `.test` (`FoodCard.test.tsx`, `normalizer.test.ts`)
 
+### テスト環境
+- DOM 環境: **happy-dom**（Vitest の environment）
+- API モック: **MSW v2**（`src/mocks/handlers.ts` にハンドラーを追加）
+- セットアップ: `src/tests/setup.ts`（MSW サーバー起動 + jest-dom）
+
+### テストルール（必須）
+1. **機能を実装したら必ずテストを書く** — 新しいロジック・コンポーネントを追加するたびに `.test.ts(x)` を作成すること
+2. **既存のテストを必ず実行する** — 実装後は `npm run test` を実行し、全テストがグリーンであることを確認してからコミットする
+3. **テストの対象**
+   - バックエンド: DB ロジック、API ハンドラー、ユーティリティ関数
+   - フロントエンド: UI コンポーネント（レンダリング・イベント・状態変化）
+4. **MSW で外部依存をモック** — fetch / NextAuth エンドポイントは `src/mocks/handlers.ts` にハンドラーを追加してモックする
+5. **Prisma は `vi.mock('@/lib/prisma')` でモック** — テストから実 DB に接続しない
+
 ## Git ブランチ規則
 - 機能: `feat/<チケット番号>` or `feat/step-N-概要`
 - 修正: `fix/<チケット番号>` or `fix/概要`
