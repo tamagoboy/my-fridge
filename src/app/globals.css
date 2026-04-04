@@ -1,14 +1,75 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&family=Manrope:wght@200..800&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
+
+/* Fonts for Crisper Mint */
 
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: "Plus Jakarta Sans", var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  
+  /* Crisper Mint Design System Colors */
+  --color-surface: #d9ffee;
+  --color-secondary: #29664c;
+  --color-secondary-container: #b1f0ce;
+  --color-on-primary-fixed-variant: #006b45;
+  --color-primary-container: #7efdbe;
+  --color-on-tertiary: #eef3ff;
+  --color-on-tertiary-fixed: #001833;
+  --color-primary-fixed-dim: #70eeb0;
+  --color-surface-container-lowest: #ffffff;
+  --color-inverse-on-surface: #72a894;
+  --color-on-background: #003629;
+  --color-on-tertiary-fixed-variant: #003a6d;
+  --color-tertiary-container: #7bb3ff;
+  --color-primary: #006944;
+  --color-on-error: #ffefee;
+  --color-outline: #4c816e;
+  --color-on-primary-container: #00603e;
+  --color-error-container: #fb5151;
+  --color-on-error-container: #570008;
+  --color-inverse-surface: #00120b;
+  --color-surface-container-highest: #9eecd0;
+  --color-surface-dim: #91e5c7;
+  --color-primary-fixed: #7efdbe;
+  --color-secondary-fixed: #b1f0ce;
+  --color-on-secondary-fixed: #014931;
+  --color-on-tertiary-container: #00315e;
+  --color-outline-variant: #82b8a4;
+  --color-on-surface-variant: #306554;
+  --color-error: #b31b25;
+  --color-on-secondary: #c8ffe0;
+  --color-on-primary: #c9ffde;
+  --color-surface-container-high: #a9f1d6;
+  --color-on-surface: #003629;
+  --color-inverse-primary: #7efdbe;
+  --color-tertiary: #005ca8;
+  --color-surface-container-low: #c0fee5;
+  --color-tertiary-fixed-dim: #5da5ff;
+  --color-on-secondary-container: #1d5c42;
+  --color-secondary-fixed-dim: #a3e2c0;
+  --color-surface-bright: #d9ffee;
+  --color-tertiary-fixed: #7bb3ff;
+  --color-surface-tint: #006944;
+  --color-secondary-dim: #1b5a40;
+  --color-surface-container: #b3f6dc;
+  --color-surface-variant: #9eecd0;
+  --color-error-dim: #9f0519;
+  --color-on-secondary-fixed-variant: #29664c;
+  --color-primary-dim: #005c3b;
+  --color-tertiary-dim: #005093;
+  --color-background: #d9ffee;
+  --color-on-primary-fixed: #004b30;
+
+  --font-headline: "Plus Jakarta Sans";
+  --font-body: "Manrope";
+  --font-label: "Manrope";
+
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -123,4 +184,14 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+@utility editorial-shadow {
+  box-shadow: 0 20px 40px rgba(0, 54, 41, 0.08);
+}
+@utility glass-header {
+  background-color: rgba(158, 236, 208, 0.6);
+  backdrop-filter: blur(20px);
+}
+@utility signature-gradient {
+  background: linear-gradient(135deg, #006944 0%, #7efdbe 100%);
 }

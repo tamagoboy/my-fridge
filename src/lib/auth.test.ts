@@ -14,6 +14,9 @@ const mockPrismaClient = vi.hoisted(() => ({
   fridgeMember: {
     create: vi.fn(),
   },
+  storageLocation: {
+    createMany: vi.fn(),
+  },
 }));
 
 vi.mock("@/lib/prisma", () => ({ prisma: mockPrismaClient }));
@@ -178,6 +181,7 @@ describe("authOptions.callbacks", () => {
             },
             fridge: { create: vi.fn() },
             fridgeMember: { create: vi.fn() },
+            storageLocation: { createMany: vi.fn() },
           };
           return fn(tx as never);
         },
@@ -212,6 +216,7 @@ describe("authOptions.callbacks", () => {
               create: vi.fn().mockResolvedValueOnce({ id: "new-fridge-1" }),
             },
             fridgeMember: { create: vi.fn() },
+            storageLocation: { createMany: vi.fn() },
           };
           return fn(tx as never);
         },

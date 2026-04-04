@@ -1,0 +1,152 @@
+<!DOCTYPE html><html class="light" lang="ja"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>ログイン - クリスパーミント</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- Google Fonts: Plus Jakarta Sans & Manrope -->
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&amp;family=Manrope:wght@200..800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface": "#d9ffee",
+                    "secondary": "#29664c",
+                    "secondary-container": "#b1f0ce",
+                    "on-primary-fixed-variant": "#006b45",
+                    "primary-container": "#7efdbe",
+                    "on-tertiary": "#eef3ff",
+                    "on-tertiary-fixed": "#001833",
+                    "primary-fixed-dim": "#70eeb0",
+                    "surface-container-lowest": "#ffffff",
+                    "inverse-on-surface": "#72a894",
+                    "on-background": "#003629",
+                    "on-tertiary-fixed-variant": "#003a6d",
+                    "tertiary-container": "#7bb3ff",
+                    "primary": "#006944",
+                    "on-error": "#ffefee",
+                    "outline": "#4c816e",
+                    "on-primary-container": "#00603e",
+                    "error-container": "#fb5151",
+                    "on-error-container": "#570008",
+                    "inverse-surface": "#00120b",
+                    "surface-container-highest": "#9eecd0",
+                    "surface-dim": "#91e5c7",
+                    "primary-fixed": "#7efdbe",
+                    "secondary-fixed": "#b1f0ce",
+                    "on-secondary-fixed": "#014931",
+                    "on-tertiary-container": "#00315e",
+                    "outline-variant": "#82b8a4",
+                    "on-surface-variant": "#306554",
+                    "error": "#b31b25",
+                    "on-secondary": "#c8ffe0",
+                    "on-primary": "#c9ffde",
+                    "surface-container-high": "#a9f1d6",
+                    "on-surface": "#003629",
+                    "inverse-primary": "#7efdbe",
+                    "tertiary": "#005ca8",
+                    "surface-container-low": "#c0fee5",
+                    "tertiary-fixed-dim": "#5da5ff",
+                    "on-secondary-container": "#1d5c42",
+                    "secondary-fixed-dim": "#a3e2c0",
+                    "surface-bright": "#d9ffee",
+                    "tertiary-fixed": "#7bb3ff",
+                    "surface-tint": "#006944",
+                    "secondary-dim": "#1b5a40",
+                    "surface-container": "#b3f6dc",
+                    "surface-variant": "#9eecd0",
+                    "error-dim": "#9f0519",
+                    "on-secondary-fixed-variant": "#29664c",
+                    "primary-dim": "#005c3b",
+                    "tertiary-dim": "#005093",
+                    "background": "#d9ffee",
+                    "on-primary-fixed": "#004b30"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Plus Jakarta Sans"],
+                    "body": ["Manrope"],
+                    "label": ["Manrope"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Manrope', sans-serif;
+            background-color: #d9ffee; /* surface */
+        }
+        .editorial-shadow {
+            box-shadow: 0 20px 40px rgba(0, 54, 41, 0.08);
+        }
+        .glass-header {
+            background-color: rgba(158, 236, 208, 0.6); /* surface-variant 60% */
+            backdrop-filter: blur(20px);
+        }
+        .signature-gradient {
+            background: linear-gradient(135deg, #006944 0%, #7efdbe 100%);
+        }
+    </style>
+</head>
+<body class="text-on-surface min-h-screen flex flex-col justify-center items-center p-6 selection:bg-primary-container selection:text-on-primary-container">
+<!-- Background Decorative Elements (Asymmetric) -->
+<div class="fixed top-[-10%] right-[-5%] w-[400px] h-[400px] bg-surface-container-low rounded-full blur-[100px] -z-10"></div>
+<div class="fixed bottom-[-10%] left-[-5%] w-[300px] h-[300px] bg-surface-container-high rounded-full blur-[80px] -z-10"></div>
+<main class="w-full max-w-md space-y-12">
+<!-- Identity Section -->
+<div class="flex flex-col items-center text-center space-y-6">
+<div class="w-24 h-24 rounded-xl bg-surface-container-lowest flex items-center justify-center editorial-shadow">
+<span class="material-symbols-outlined text-primary text-5xl" data-icon="kitchen" style="font-variation-settings: &quot;FILL&quot; 1;">kitchen</span>
+</div>
+<div class="space-y-3">
+<h1 class="font-headline text-4xl font-extrabold tracking-tighter text-on-surface" style="">my-fridge</h1>
+<p class="font-body text-on-surface-variant max-w-[280px] leading-relaxed mx-auto" style="">食材を新鮮に保ち、廃棄を最小限に。</p>
+</div>
+</div>
+<!-- Login Card -->
+<div class="bg-surface-container-lowest rounded-xl p-10 editorial-shadow border border-outline-variant/15 flex flex-col items-center space-y-8">
+<!-- Abstract Illustration / Visual Anchor -->
+<div class="w-full h-48 rounded-lg overflow-hidden relative group">
+<img alt="Fresh ingredients" class="w-full h-full object-cover grayscale-[20%] opacity-90 transition-transform duration-700 group-hover:scale-105" data-alt="Close-up of fresh organic mint leaves and crisp vegetables in a bright, modern kitchen setting with soft morning light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAlfbB_XssTFPypPUzn12O_i5KpIvoInO_PfSZ7G22wdhjosGN7ByrGwxkI0B7w71p1TrCOoDhSYI0sDAVU4puFqkCqO_sNjhFiKDir41JyLWTIsvobw5ws_pRO-WhdrpzFLQYgIIJR8O1SUYp3cJ_klaRBEKqJK4Umv29pYnPthssffMfL6pPpqFBbuWopQA1nhYqULypV-99Bx5vpEpezN2vpBFfO9mAiuzULoUT0t_FDCihH3Vkl0lNeS6_iq3E6oGKcc0TlFhoo" style="">
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-lowest/40 to-transparent"></div>
+</div>
+<div class="w-full space-y-4">
+<p class="font-label text-[10px] uppercase tracking-[0.2em] text-outline text-center" style="">おかえりなさい</p>
+<!-- Google Sign-In Button (Primary Action) -->
+<button class="w-full h-16 signature-gradient text-on-primary rounded-xl font-headline font-bold text-lg flex items-center justify-center space-x-3 active:scale-[0.98] transition-transform duration-200 editorial-shadow" style="">
+<svg class="w-6 h-6" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#ffffff"></path>
+<path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#ffffff"></path>
+<path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#ffffff"></path>
+<path d="M12 5.38c1.62 0 3.06.56 4.21 1.66l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 12-4.53z" fill="#ffffff"></path>
+</svg>
+<span class="" style="">Googleでサインイン</span>
+</button>
+</div>
+</div>
+<!-- Footer Footer (Minimalist) -->
+<footer class="flex justify-between items-center px-4">
+<button class="font-label text-xs font-bold text-on-surface-variant hover:text-primary transition-colors duration-200" style="">プライバシーポリシー</button>
+<div class="h-1 w-1 bg-outline-variant rounded-full"></div>
+<button class="font-label text-xs font-bold text-on-surface-variant hover:text-primary transition-colors duration-200" style="">利用規約</button>
+<div class="h-1 w-1 bg-outline-variant rounded-full"></div>
+<button class="font-label text-xs font-bold text-on-surface-variant hover:text-primary transition-colors duration-200" style="">ヘルプ</button>
+</footer>
+</main>
+<!-- Bottom Accessibility Pad (Simulating Thumb Zone Focus) -->
+<div class="fixed bottom-0 left-0 w-full h-12 bg-transparent pointer-events-none"></div>
+</body></html>

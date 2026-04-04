@@ -1,6 +1,6 @@
+import { SettingsClient } from '@/components/SettingsClient'
 import { SignOutButton } from "@/components/SignOutButton";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";
 import Link from "next/link";
@@ -22,21 +22,14 @@ export default async function SettingsPage() {
           </p>
           <h1 className="text-3xl font-semibold tracking-tight text-zinc-950">設定</h1>
           <p className="text-sm leading-7 text-zinc-600">
-            Step 2 時点ではアカウント確認とログアウトのみ実装しています。
+            アカウント確認、メンバー共有、保管場所管理をここで行えます。
           </p>
         </div>
 
-        <Card className="rounded-3xl border-zinc-200 shadow-sm">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-normal text-zinc-500">アカウント</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-lg font-semibold text-zinc-950">
-              {session.user.name ?? "名前未設定"}
-            </p>
-            <p className="mt-1 text-sm text-zinc-600">{session.user.email}</p>
-          </CardContent>
-        </Card>
+        <SettingsClient
+          userName={session.user.name ?? '名前未設定'}
+          userEmail={session.user.email ?? ''}
+        />
 
         <div className="flex items-center gap-3">
           <SignOutButton />

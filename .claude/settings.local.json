@@ -4,7 +4,15 @@
       "mcp__claude_ai_Atlassian__createJiraIssue",
       "Bash(docker compose:*)",
       "Bash(rsync -a --exclude='.next' /c/Users/tomo2/OneDrive/my-fridge/ /c/Users/tomo2/projects/my-fridge/)",
-      "Bash(xargs -I{} cp -r {} /c/Users/tomo2/projects/my-fridge/)"
+      "Bash(xargs -I{} cp -r {} /c/Users/tomo2/projects/my-fridge/)",
+      "Bash(npx shadcn@latest add tabs --yes)",
+      "Bash(npx shadcn@latest add dialog --yes)",
+      "Bash(npx shadcn@latest add input --yes)",
+      "Bash(npx shadcn@latest add label --yes)",
+      "Bash(npx tsc:*)",
+      "Bash(npx shadcn@latest add alert --yes)",
+      "Bash(npx shadcn@latest add sheet --yes)",
+      "Bash(npx shadcn@latest add sonner --yes)"
     ]
   }
 }

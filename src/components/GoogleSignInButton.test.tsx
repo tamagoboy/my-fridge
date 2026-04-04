@@ -9,10 +9,10 @@ vi.mock("next-auth/react", () => ({
 }));
 
 describe("GoogleSignInButton", () => {
-  it("「Google でログイン」ボタンが表示される", () => {
+  it("「Googleでサインイン」ボタンが表示される", () => {
     render(<GoogleSignInButton />);
     expect(
-      screen.getByRole("button", { name: "Google でログイン" }),
+      screen.getByRole("button", { name: "Googleでサインイン" }),
     ).toBeInTheDocument();
   });
 

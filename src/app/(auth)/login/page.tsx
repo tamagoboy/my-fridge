@@ -1,8 +1,7 @@
 import { GoogleSignInButton } from "@/components/GoogleSignInButton";
-import { Button } from "@/components/ui/button";
 import { authOptions } from "@/lib/auth";
+import { Refrigerator } from "lucide-react";
 import { getServerSession } from "next-auth";
-import Link from "next/link";
 import { redirect } from "next/navigation";
 
 export default async function LoginPage() {
@@ -13,40 +12,59 @@ export default async function LoginPage() {
   }
 
   return (
-    <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_top,_rgba(254,240,138,0.5),_transparent_32%),linear-gradient(135deg,_#fff7ed_0%,_#fffbeb_45%,_#fef2f2_100%)] px-6 py-16">
-      <section className="w-full max-w-md rounded-[2rem] border border-white/70 bg-white/90 p-8 shadow-2xl shadow-orange-950/10 backdrop-blur">
-        <div className="space-y-4">
-          <p className="text-sm font-semibold tracking-[0.24em] text-orange-600 uppercase">
-            myFridge
-          </p>
-          <h1 className="text-3xl font-semibold tracking-tight text-zinc-950">
-            冷蔵庫の状態を
-            <br />
-            Google アカウントでまとめる
-          </h1>
-          <p className="text-sm leading-7 text-zinc-600">
-            ログインするとユーザー情報を同期し、初回のみ専用の冷蔵庫を自動で作成します。
-          </p>
+    <>
+      {/* Background Decorative Elements (Asymmetric) */}
+      <div className="fixed top-[-10%] right-[-5%] w-[400px] h-[400px] bg-surface-container-low rounded-full blur-[100px] -z-10"></div>
+      <div className="fixed bottom-[-10%] left-[-5%] w-[300px] h-[300px] bg-surface-container-high rounded-full blur-[80px] -z-10"></div>
+      
+      <main className="w-full max-w-md space-y-12 mx-auto flex flex-col justify-center items-center min-h-screen p-6">
+        {/* Identity Section */}
+        <div className="flex flex-col items-center text-center space-y-6">
+          <div className="flex h-24 w-24 items-center justify-center rounded-[28px] bg-surface-container-lowest editorial-shadow">
+            <Refrigerator className="size-12 text-primary" strokeWidth={2.2} />
+          </div>
+          <div className="space-y-3">
+            <h1 className="font-headline text-4xl font-extrabold tracking-tighter text-on-surface">my-fridge</h1>
+            <p className="font-body text-on-surface-variant max-w-[280px] leading-relaxed mx-auto">
+              食材を新鮮に保ち、廃棄を最小限に。
+            </p>
+          </div>
         </div>
 
-        <div className="mt-8 space-y-4">
-          <GoogleSignInButton />
-          <p className="text-xs leading-6 text-zinc-500">
-            開発中は Google OAuth と NEXTAUTH 関連の環境変数が必要です。
-          </p>
+        {/* Login Card */}
+        <div className="bg-surface-container-lowest rounded-xl p-10 editorial-shadow border border-outline-variant/15 flex flex-col items-center space-y-8 w-full">
+          {/* Abstract Illustration / Visual Anchor */}
+          <div className="w-full h-48 rounded-lg overflow-hidden relative group">
+            {/* Using a placeholder or the design layout image */}
+            <img
+              alt="Fresh ingredients"
+              className="w-full h-full object-cover grayscale-[20%] opacity-90 transition-transform duration-700 group-hover:scale-105"
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuAlfbB_XssTFPypPUzn12O_i5KpIvoInO_PfSZ7G22wdhjosGN7ByrGwxkI0B7w71p1TrCOoDhSYI0sDAVU4puFqkCqO_sNjhFiKDir41JyLWTIsvobw5ws_pRO-WhdrpzFLQYgIIJR8O1SUYp3cJ_klaRBEKqJK4Umv29pYnPthssffMfL6pPpqFBbuWopQA1nhYqULypV-99Bx5vpEpezN2vpBFfO9mAiuzULoUT0t_FDCihH3Vkl0lNeS6_iq3E6oGKcc0TlFhoo"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-surface-container-lowest/40 to-transparent"></div>
+          </div>
+          
+          <div className="w-full space-y-4">
+            <p className="font-label text-[10px] uppercase tracking-[0.2em] text-outline text-center">おかえりなさい</p>
+            <GoogleSignInButton />
+          </div>
         </div>
 
-        <div className="mt-10 rounded-2xl bg-orange-50 p-4 text-sm leading-7 text-orange-950">
-          <p className="font-medium">このステップで有効になること</p>
-          <p>ログイン、セッション保持、未認証ルートのリダイレクト、ログアウト。</p>
-        </div>
-
-        <div className="mt-8">
-          <Button variant="ghost" asChild className="text-orange-700 hover:text-orange-800 hover:bg-orange-50 -ml-4">
-            <Link href="/">トップへ戻る</Link>
-          </Button>
-        </div>
-      </section>
-    </main>
+        {/* Footer Footer (Minimalist) */}
+        <footer className="flex justify-between items-center px-4 w-full text-center max-w-[300px] mx-auto mt-auto">
+          <button className="font-label text-xs font-bold text-on-surface-variant hover:text-primary transition-colors duration-200">
+            プライバシーポリシー
+          </button>
+          <div className="h-1 w-1 bg-outline-variant rounded-full"></div>
+          <button className="font-label text-xs font-bold text-on-surface-variant hover:text-primary transition-colors duration-200">
+            利用規約
+          </button>
+          <div className="h-1 w-1 bg-outline-variant rounded-full"></div>
+          <button className="font-label text-xs font-bold text-on-surface-variant hover:text-primary transition-colors duration-200">
+            ヘルプ
+          </button>
+        </footer>
+      </main>
+    </>
   );
 }

@@ -10,17 +10,14 @@ datasource db {
 // 認証テーブル（Google OAuth のみ対応）
 // ─────────────────────────────────────────────
 
-// - セッション管理は JWT 戦略（Cookie）→ Session テーブル不要
-// - Google のみ対応 → Account テーブル不要、googleId を User に直接持つ
-// - メール認証なし → VerificationToken テーブル不要
 model User {
   id       String  @id @default(cuid())
-  googleId String  @unique // Google の sub フィールド（ユーザー固有 ID）
+  googleId String  @unique
   name     String?
   email    String  @unique
-  image    String? // Google プロフィール画像 URL
+  image    String?
 
-  fridgeMember FridgeMember? // 所属する冷蔵庫（1 ユーザー 1 冷蔵庫）
+  fridgeMember FridgeMember?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -30,23 +27,19 @@ model User {
 // 冷蔵庫共有テーブル
 // ─────────────────────────────────────────────
 
-// 冷蔵庫グループ
-// 初回ログイン時に自動作成される
 model Fridge {
   id   String @id @default(cuid())
   name String @default("マイ冷蔵庫")
 
-  members     FridgeMember[]
-  foods       Food[]
-  invitations FridgeInvitation[]
+  members          FridgeMember[]
+  foods            Food[]
+  invitations      FridgeInvitation[]
+  storageLocations StorageLocation[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-// 冷蔵庫メンバー（ユーザーと冷蔵庫の紐づけ）
-// @@unique([userId]) で 1 ユーザー 1 冷蔵庫を保証
-// 権限区分なし（全メンバー同等）
 model FridgeMember {
   id       String @id @default(cuid())
   userId   String @unique
@@ -60,14 +53,11 @@ model FridgeMember {
   @@index([fridgeId])
 }
 
-// 招待リンク管理
-// 冷蔵庫につき同時に有効なリンクは 1 つまで
-// 再発行時は旧リンクを削除して新規作成
 model FridgeInvitation {
   id        String   @id @default(cuid())
   fridgeId  String
-  token     String   @unique @default(uuid()) // 招待 URL に含めるトークン
-  expiresAt DateTime // 有効期限（作成から 7 日間）
+  token     String   @unique @default(uuid())
+  expiresAt DateTime
 
   fridge Fridge @relation(fields: [fridgeId], references: [id], onDelete: Cascade)
 
@@ -78,32 +68,49 @@ model FridgeInvitation {
 // アプリケーションテーブル
 // ─────────────────────────────────────────────
 
-// 食材テーブル
-// 食材はユーザーではなく冷蔵庫に紐づく
-model Food {
-  id              String    @id @default(cuid())
-  name            String    // 食材名
-  category        String?   // カテゴリ名（野菜/肉/魚/惣菜/乳製品/調味料/その他）
-  quantity        Float     // 数量
-  unit            String    // 単位（個/本/袋/g/ml/パック 等、自由入力）
-  expiryDate      DateTime? // 賞味期限（null = 期限なし）
-  storageLocation String?   // 保管場所: '冷蔵室'|'冷凍室'|'野菜室'|'常温'
-  fridgeId        String
+// 保管場所（初回ログイン時にデフォルト3つ自動作成）
+model StorageLocation {
+  id        String @id @default(cuid())
+  name      String
+  sortOrder Int    @default(0)
+  fridgeId  String
 
   fridge Fridge @relation(fields: [fridgeId], references: [id], onDelete: Cascade)
+  foods  Food[]
+
+  @@unique([fridgeId, name])
+  @@index([fridgeId])
+}
+
+// 食材テーブル
+model Food {
+  id                String    @id @default(cuid())
+  name              String
+  category          String?
+  remainingStatus   String    @default("full") // 'full'|'half'|'little'
+  storageLocationId String?
+  fridgeId          String
+  expiryDate        DateTime? // Phase 2 (Step 11) で使用
+
+  fridge          Fridge           @relation(fields: [fridgeId], references: [id], onDelete: Cascade)
+  storageLocation StorageLocation? @relation(fields: [storageLocationId], references: [id], onDelete: SetNull)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([fridgeId])
-  @@index([fridgeId, storageLocation])
+  @@index([fridgeId, storageLocationId])
   @@index([fridgeId, expiryDate])
 }
 
-// ─────────────────────────────────────────────
-// Phase 3 以降で追加予定
-// ─────────────────────────────────────────────
-// - NormalizationRule: 正規化はバックエンドコードで実装（Step 6）
-// - ProductMaster: 同上
-// - CategoryStorageMapping: Phase 3 で追加
-// - Category: 同上
+// 入力履歴（Step 10 サジェスト用）
+model InputHistory {
+  id       String @id @default(cuid())
+  fridgeId String
+  name     String
+  category String?
+  count    Int    @default(1)
+
+  @@unique([fridgeId, name])
+  @@index([fridgeId])
+}

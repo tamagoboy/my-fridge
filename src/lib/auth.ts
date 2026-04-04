@@ -48,6 +48,14 @@ async function ensureUserAndFridgeMember({
         select: { id: true },
       });
 
+      await transaction.storageLocation.createMany({
+        data: [
+          { fridgeId: fridge.id, name: "冷蔵庫", sortOrder: 0 },
+          { fridgeId: fridge.id, name: "冷凍庫", sortOrder: 1 },
+          { fridgeId: fridge.id, name: "常温", sortOrder: 2 },
+        ],
+      });
+
       await transaction.fridgeMember.create({
         data: {
           fridgeId: fridge.id,
@@ -93,6 +101,14 @@ async function ensureUserAndFridgeMember({
         select: { id: true },
       });
 
+      await transaction.storageLocation.createMany({
+        data: [
+          { fridgeId: fridge.id, name: "冷蔵庫", sortOrder: 0 },
+          { fridgeId: fridge.id, name: "冷凍庫", sortOrder: 1 },
+          { fridgeId: fridge.id, name: "常温", sortOrder: 2 },
+        ],
+      });
+
       await transaction.fridgeMember.create({
         data: {
           fridgeId: fridge.id,
@@ -119,6 +135,14 @@ async function ensureUserAndFridgeMember({
     const fridge = await transaction.fridge.create({
       data: {},
       select: { id: true },
+    });
+
+    await transaction.storageLocation.createMany({
+      data: [
+        { fridgeId: fridge.id, name: "冷蔵庫", sortOrder: 0 },
+        { fridgeId: fridge.id, name: "冷凍庫", sortOrder: 1 },
+        { fridgeId: fridge.id, name: "常温", sortOrder: 2 },
+      ],
     });
 
     await transaction.fridgeMember.create({

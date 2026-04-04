@@ -2,7 +2,16 @@ import { getToken } from "next-auth/jwt";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
-const PROTECTED_PREFIXES = ["/dashboard", "/scan", "/settings", "/api/foods", "/api/ocr"];
+const PROTECTED_PREFIXES = [
+  "/dashboard",
+  "/scan",
+  "/settings",
+  "/api/foods",
+  "/api/ocr",
+  "/api/storage-locations",
+  "/api/consume",
+  "/api/fridge",
+];
 
 function isProtectedPath(pathname: string) {
   return PROTECTED_PREFIXES.some(
@@ -28,5 +37,15 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/login", "/dashboard/:path*", "/scan/:path*", "/settings/:path*", "/api/foods/:path*", "/api/ocr/:path*"],
+  matcher: [
+    "/login",
+    "/dashboard/:path*",
+    "/scan/:path*",
+    "/settings/:path*",
+    "/api/foods/:path*",
+    "/api/ocr/:path*",
+    "/api/storage-locations/:path*",
+    "/api/consume/:path*",
+    "/api/fridge/:path*",
+  ],
 };
