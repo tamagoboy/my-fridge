@@ -16,6 +16,20 @@ function daysFromNow(days: number): Date {
   return date
 }
 
+async function ensureStorageLocations(fridgeId: string, names: string[]) {
+  const locations = await Promise.all(
+    names.map((name, index) =>
+      prisma.storageLocation.upsert({
+        where: { fridgeId_name: { fridgeId, name } },
+        update: { sortOrder: index },
+        create: { fridgeId, name, sortOrder: index },
+      })
+    )
+  )
+
+  return Object.fromEntries(locations.map((location) => [location.name, location.id]))
+}
+
 async function main() {
   console.log('🌱 シードデータの投入を開始します...')
 
@@ -94,6 +108,19 @@ async function main() {
   })
   console.log('  FridgeInvitation: test-invite-token-001')
 
+  const fridge1Locations = await ensureStorageLocations(fridge1.id, [
+    '冷蔵庫',
+    '冷凍庫',
+    '常温',
+    '野菜室',
+  ])
+  const fridge2Locations = await ensureStorageLocations(fridge2.id, [
+    '冷蔵庫',
+    '冷凍庫',
+    '常温',
+    '野菜室',
+  ])
+
   // ─────────────────────────────────────────────
   // Food（test-fridge-1 に紐づく）
   // ─────────────────────────────────────────────
@@ -101,25 +128,20 @@ async function main() {
   await prisma.food.deleteMany({ where: { fridgeId: fridge1.id } })
 
   const foods = [
-    // 冷蔵室
-    { name: '牛乳', category: '乳製品', quantity: 1, unit: '本', expiryDate: daysFromNow(0), storageLocation: '冷蔵室' },
-    { name: '豚バラ肉', category: '肉', quantity: 300, unit: 'g', expiryDate: daysFromNow(-1), storageLocation: '冷蔵室' },
-    { name: 'ヨーグルト', category: '乳製品', quantity: 2, unit: '個', expiryDate: daysFromNow(2), storageLocation: '冷蔵室' },
-    { name: '納豆', category: 'その他', quantity: 3, unit: 'パック', expiryDate: daysFromNow(3), storageLocation: '冷蔵室' },
-    { name: '卵', category: 'その他', quantity: 10, unit: '個', expiryDate: daysFromNow(10), storageLocation: '冷蔵室' },
-    { name: '味噌', category: '調味料', quantity: 1, unit: '個', expiryDate: null, storageLocation: '冷蔵室' },
-    // 冷凍室
-    { name: '鶏もも肉', category: '肉', quantity: 500, unit: 'g', expiryDate: daysFromNow(30), storageLocation: '冷凍室' },
-    { name: '冷凍うどん', category: 'その他', quantity: 3, unit: '袋', expiryDate: daysFromNow(60), storageLocation: '冷凍室' },
-    // 野菜室
-    { name: 'にんじん', category: '野菜', quantity: 3, unit: '本', expiryDate: daysFromNow(5), storageLocation: '野菜室' },
-    { name: 'ほうれん草', category: '野菜', quantity: 1, unit: '袋', expiryDate: daysFromNow(1), storageLocation: '野菜室' },
-    { name: 'トマト', category: '野菜', quantity: 4, unit: '個', expiryDate: daysFromNow(4), storageLocation: '野菜室' },
-    // 常温
-    { name: '米', category: 'その他', quantity: 5, unit: 'kg', expiryDate: null, storageLocation: '常温' },
-    { name: '醤油', category: '調味料', quantity: 1, unit: '本', expiryDate: daysFromNow(90), storageLocation: '常温' },
-    // 保管場所なし
-    { name: 'バナナ', category: '野菜', quantity: 3, unit: '本', expiryDate: daysFromNow(2), storageLocation: null },
+    { name: '牛乳', category: '乳製品', remainingStatus: 'half', expiryDate: daysFromNow(0), storageLocationId: fridge1Locations['冷蔵庫'] },
+    { name: '豚バラ肉', category: '肉', remainingStatus: 'little', expiryDate: daysFromNow(-1), storageLocationId: fridge1Locations['冷蔵庫'] },
+    { name: 'ヨーグルト', category: '乳製品', remainingStatus: 'half', expiryDate: daysFromNow(2), storageLocationId: fridge1Locations['冷蔵庫'] },
+    { name: '納豆', category: 'その他', remainingStatus: 'full', expiryDate: daysFromNow(3), storageLocationId: fridge1Locations['冷蔵庫'] },
+    { name: '卵', category: 'その他', remainingStatus: 'full', expiryDate: daysFromNow(10), storageLocationId: fridge1Locations['冷蔵庫'] },
+    { name: '味噌', category: '調味料', remainingStatus: 'full', expiryDate: null, storageLocationId: fridge1Locations['冷蔵庫'] },
+    { name: '鶏もも肉', category: '肉', remainingStatus: 'full', expiryDate: daysFromNow(30), storageLocationId: fridge1Locations['冷凍庫'] },
+    { name: '冷凍うどん', category: 'その他', remainingStatus: 'half', expiryDate: daysFromNow(60), storageLocationId: fridge1Locations['冷凍庫'] },
+    { name: 'にんじん', category: '野菜', remainingStatus: 'half', expiryDate: daysFromNow(5), storageLocationId: fridge1Locations['野菜室'] },
+    { name: 'ほうれん草', category: '野菜', remainingStatus: 'little', expiryDate: daysFromNow(1), storageLocationId: fridge1Locations['野菜室'] },
+    { name: 'トマト', category: '野菜', remainingStatus: 'full', expiryDate: daysFromNow(4), storageLocationId: fridge1Locations['野菜室'] },
+    { name: '米', category: 'その他', remainingStatus: 'full', expiryDate: null, storageLocationId: fridge1Locations['常温'] },
+    { name: '醤油', category: '調味料', remainingStatus: 'half', expiryDate: daysFromNow(90), storageLocationId: fridge1Locations['常温'] },
+    { name: 'バナナ', category: '野菜', remainingStatus: 'little', expiryDate: daysFromNow(2), storageLocationId: null },
   ]
 
   await prisma.food.createMany({
@@ -133,17 +155,13 @@ async function main() {
   await prisma.food.deleteMany({ where: { fridgeId: fridge2.id } })
 
   const foods2 = [
-    // 冷蔵室
-    { name: '豆腐', category: 'その他', quantity: 1, unit: 'パック', expiryDate: daysFromNow(1), storageLocation: '冷蔵室' },
-    { name: 'チーズ', category: '乳製品', quantity: 1, unit: '袋', expiryDate: daysFromNow(14), storageLocation: '冷蔵室' },
-    { name: 'ハム', category: '肉', quantity: 1, unit: 'パック', expiryDate: daysFromNow(-2), storageLocation: '冷蔵室' },
-    // 冷凍室
-    { name: '冷凍餃子', category: 'その他', quantity: 1, unit: '袋', expiryDate: daysFromNow(45), storageLocation: '冷凍室' },
-    // 野菜室
-    { name: 'キャベツ', category: '野菜', quantity: 1, unit: '個', expiryDate: daysFromNow(3), storageLocation: '野菜室' },
-    { name: 'ピーマン', category: '野菜', quantity: 5, unit: '個', expiryDate: daysFromNow(6), storageLocation: '野菜室' },
-    // 常温
-    { name: 'パスタ', category: 'その他', quantity: 2, unit: '袋', expiryDate: null, storageLocation: '常温' },
+    { name: '豆腐', category: 'その他', remainingStatus: 'little', expiryDate: daysFromNow(1), storageLocationId: fridge2Locations['冷蔵庫'] },
+    { name: 'チーズ', category: '乳製品', remainingStatus: 'full', expiryDate: daysFromNow(14), storageLocationId: fridge2Locations['冷蔵庫'] },
+    { name: 'ハム', category: '肉', remainingStatus: 'little', expiryDate: daysFromNow(-2), storageLocationId: fridge2Locations['冷蔵庫'] },
+    { name: '冷凍餃子', category: 'その他', remainingStatus: 'full', expiryDate: daysFromNow(45), storageLocationId: fridge2Locations['冷凍庫'] },
+    { name: 'キャベツ', category: '野菜', remainingStatus: 'half', expiryDate: daysFromNow(3), storageLocationId: fridge2Locations['野菜室'] },
+    { name: 'ピーマン', category: '野菜', remainingStatus: 'full', expiryDate: daysFromNow(6), storageLocationId: fridge2Locations['野菜室'] },
+    { name: 'パスタ', category: 'その他', remainingStatus: 'half', expiryDate: null, storageLocationId: fridge2Locations['常温'] },
   ]
 
   await prisma.food.createMany({
