@@ -1,37 +1,34 @@
 'use client'
 
 import { ScanConfirmModal } from '@/components/ScanConfirmModal'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { useStorageLocations } from '@/hooks/useFoods'
 import type { OcrResultItem } from '@/types/food'
-import { Camera, Loader2, ScanText } from 'lucide-react'
-import { useState } from 'react'
+import { Camera, Loader2 } from 'lucide-react'
+import { useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 export default function ScanPage() {
   const { data: storageLocations = [] } = useStorageLocations()
-  const [selectedFile, setSelectedFile] = useState<File | null>(null)
-  const [debugText, setDebugText] = useState('')
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [preview, setPreview] = useState<string | null>(null)
   const [isScanning, setIsScanning] = useState(false)
   const [items, setItems] = useState<OcrResultItem[] | null>(null)
 
-  const handleScan = async () => {
-    if (!selectedFile && !debugText.trim()) {
-      toast.error('画像または確認用テキストを入力してください')
-      return
-    }
+  const handleCameraButtonClick = () => {
+    fileInputRef.current?.click()
+  }
 
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    setPreview(URL.createObjectURL(file))
     setIsScanning(true)
+
     try {
       const formData = new FormData()
-      if (selectedFile) {
-        formData.append('image', selectedFile)
-      }
-      if (debugText.trim()) {
-        formData.append('debugText', debugText.trim())
-      }
+      formData.append('image', file)
 
       const response = await fetch('/api/ocr', {
         method: 'POST',
@@ -49,54 +46,64 @@ export default function ScanPage() {
       toast.error(error instanceof Error ? error.message : 'OCRに失敗しました')
     } finally {
       setIsScanning(false)
+      // 同じファイルを再選択できるようにリセット
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''
+      }
     }
   }
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-6">
       <div className="mb-6 space-y-2">
-        <h1 className="flex items-center gap-2 text-2xl font-bold text-zinc-900">
-          <ScanText className="size-6 text-green-600" />
-          レシートをスキャン
-        </h1>
-        <p className="text-sm leading-6 text-zinc-600">
-          画像を選ぶと OCR で商品名を抽出し、保管場所を自動分類します。Vision API 未設定時は下のテキスト欄でも確認できます。
+        <h1 className="text-2xl font-bold text-zinc-900">レシートをスキャン</h1>
+        <p className="text-sm text-zinc-600">
+          ボタンを押してレシートを撮影すると、商品名を自動で読み取ります。
         </p>
       </div>
 
-      <div className="space-y-4 rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm">
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-zinc-900">レシート画像</label>
-          <Input
-            type="file"
-            accept="image/*"
-            capture="environment"
-            onChange={(event) => setSelectedFile(event.target.files?.[0] ?? null)}
-          />
-          {selectedFile ? <p className="text-xs text-zinc-500">選択中: {selectedFile.name}</p> : null}
-        </div>
+      {/* 隠しファイルinput（OSカメラ起動） */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        className="hidden"
+        onChange={handleFileChange}
+      />
 
-        <Alert>
-          <Camera className="size-4" />
-          <AlertTitle>開発用フォールバック</AlertTitle>
-          <AlertDescription>
-            Vision API の資格情報がまだない場合は、レシートのテキストを貼り付けても同じ確認モーダルまで進めます。
-          </AlertDescription>
-        </Alert>
+      <div className="flex flex-col items-center gap-6 rounded-3xl border border-zinc-200 bg-white p-8 shadow-sm">
+        {preview ? (
+          <div className="w-full overflow-hidden rounded-2xl border border-zinc-200">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={preview} alt="撮影したレシート" className="w-full object-contain" />
+          </div>
+        ) : (
+          <div className="flex h-48 w-full items-center justify-center rounded-2xl border-2 border-dashed border-zinc-200 bg-zinc-50">
+            <div className="text-center text-zinc-400">
+              <Camera className="mx-auto mb-2 size-10" />
+              <p className="text-sm">カメラでレシートを撮影</p>
+            </div>
+          </div>
+        )}
 
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-zinc-900">確認用テキスト</label>
-          <textarea
-            value={debugText}
-            onChange={(event) => setDebugText(event.target.value)}
-            placeholder={'牛乳\n卵\n豚こま切れ\n玉ねぎ'}
-            className="min-h-40 w-full rounded-2xl border border-zinc-200 px-4 py-3 text-sm outline-none focus:border-green-500"
-          />
-        </div>
-
-        <Button onClick={handleScan} disabled={isScanning} className="w-full">
-          {isScanning ? <Loader2 className="size-4 animate-spin" /> : <ScanText className="size-4" />}
-          OCR を実行する
+        <Button
+          onClick={handleCameraButtonClick}
+          disabled={isScanning}
+          size="lg"
+          className="w-full gap-2"
+        >
+          {isScanning ? (
+            <>
+              <Loader2 className="size-5 animate-spin" />
+              スキャン中...
+            </>
+          ) : (
+            <>
+              <Camera className="size-5" />
+              {preview ? '撮り直す' : 'レシートをスキャン'}
+            </>
+          )}
         </Button>
       </div>
 
@@ -106,8 +113,7 @@ export default function ScanPage() {
           storageLocations={storageLocations}
           onConfirm={() => {
             setItems(null)
-            setSelectedFile(null)
-            setDebugText('')
+            setPreview(null)
           }}
           onClose={() => setItems(null)}
         />
