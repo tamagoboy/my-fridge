@@ -4,12 +4,18 @@ import { Refrigerator } from "lucide-react";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 
-export default async function LoginPage() {
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string; detail?: string }>;
+}) {
   const session = await getServerSession(authOptions);
 
   if (session) {
     redirect("/dashboard");
   }
+
+  const params = await searchParams;
 
   return (
     <>
@@ -18,6 +24,13 @@ export default async function LoginPage() {
       <div className="fixed bottom-[-10%] left-[-5%] w-[300px] h-[300px] bg-surface-container-high rounded-full blur-[80px] -z-10"></div>
       
       <main className="w-full max-w-md space-y-12 mx-auto flex flex-col justify-center items-center min-h-screen p-6">
+        {/* Error Display */}
+        {params.error && (
+          <div className="w-full bg-red-100 border border-red-300 text-red-800 rounded-lg p-4 text-sm break-all">
+            <p className="font-bold">ログインエラー: {params.error}</p>
+            {params.detail && <p className="mt-1">{params.detail}</p>}
+          </div>
+        )}
         {/* Identity Section */}
         <div className="flex flex-col items-center text-center space-y-6">
           <div className="flex h-24 w-24 items-center justify-center rounded-[28px] bg-surface-container-lowest editorial-shadow">

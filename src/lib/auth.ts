@@ -9,154 +9,100 @@ type EnsureUserParams = {
   image?: string | null;
 };
 
+async function createFridgeForUser(userId: string) {
+  const fridge = await prisma.fridge.create({
+    data: {},
+    select: { id: true },
+  });
+
+  await prisma.storageLocation.createMany({
+    data: [
+      { fridgeId: fridge.id, name: "冷蔵庫", sortOrder: 0 },
+      { fridgeId: fridge.id, name: "冷凍庫", sortOrder: 1 },
+      { fridgeId: fridge.id, name: "常温", sortOrder: 2 },
+    ],
+  });
+
+  await prisma.fridgeMember.create({
+    data: {
+      fridgeId: fridge.id,
+      userId,
+    },
+  });
+
+  return fridge.id;
+}
+
 async function ensureUserAndFridgeMember({
   email,
   googleId,
   name,
   image,
 }: EnsureUserParams) {
-  return prisma.$transaction(async (transaction) => {
-    const userByGoogleId = await transaction.user.findUnique({
-      where: { googleId },
-      select: {
-        id: true,
-        fridgeMember: {
-          select: { fridgeId: true },
-        },
+  // googleId でユーザーを検索
+  const userByGoogleId = await prisma.user.findUnique({
+    where: { googleId },
+    select: {
+      id: true,
+      fridgeMember: {
+        select: { fridgeId: true },
       },
+    },
+  });
+
+  if (userByGoogleId) {
+    await prisma.user.update({
+      where: { googleId },
+      data: { email, image, name },
     });
 
-    if (userByGoogleId) {
-      await transaction.user.update({
-        where: { googleId },
-        data: {
-          email,
-          image,
-          name,
-        },
-      });
-
-      if (userByGoogleId.fridgeMember) {
-        return {
-          fridgeId: userByGoogleId.fridgeMember.fridgeId,
-          userId: userByGoogleId.id,
-        };
-      }
-
-      const fridge = await transaction.fridge.create({
-        data: {},
-        select: { id: true },
-      });
-
-      await transaction.storageLocation.createMany({
-        data: [
-          { fridgeId: fridge.id, name: "冷蔵庫", sortOrder: 0 },
-          { fridgeId: fridge.id, name: "冷凍庫", sortOrder: 1 },
-          { fridgeId: fridge.id, name: "常温", sortOrder: 2 },
-        ],
-      });
-
-      await transaction.fridgeMember.create({
-        data: {
-          fridgeId: fridge.id,
-          userId: userByGoogleId.id,
-        },
-      });
-
+    if (userByGoogleId.fridgeMember) {
       return {
-        fridgeId: fridge.id,
+        fridgeId: userByGoogleId.fridgeMember.fridgeId,
         userId: userByGoogleId.id,
       };
     }
 
-    const userByEmail = await transaction.user.findUnique({
-      where: { email },
-      select: {
-        id: true,
-        fridgeMember: {
-          select: { fridgeId: true },
-        },
+    const fridgeId = await createFridgeForUser(userByGoogleId.id);
+    return { fridgeId, userId: userByGoogleId.id };
+  }
+
+  // email でユーザーを検索
+  const userByEmail = await prisma.user.findUnique({
+    where: { email },
+    select: {
+      id: true,
+      fridgeMember: {
+        select: { fridgeId: true },
       },
+    },
+  });
+
+  if (userByEmail) {
+    await prisma.user.update({
+      where: { email },
+      data: { googleId, image, name },
     });
 
-    if (userByEmail) {
-      await transaction.user.update({
-        where: { email },
-        data: {
-          googleId,
-          image,
-          name,
-        },
-      });
-
-      if (userByEmail.fridgeMember) {
-        return {
-          fridgeId: userByEmail.fridgeMember.fridgeId,
-          userId: userByEmail.id,
-        };
-      }
-
-      const fridge = await transaction.fridge.create({
-        data: {},
-        select: { id: true },
-      });
-
-      await transaction.storageLocation.createMany({
-        data: [
-          { fridgeId: fridge.id, name: "冷蔵庫", sortOrder: 0 },
-          { fridgeId: fridge.id, name: "冷凍庫", sortOrder: 1 },
-          { fridgeId: fridge.id, name: "常温", sortOrder: 2 },
-        ],
-      });
-
-      await transaction.fridgeMember.create({
-        data: {
-          fridgeId: fridge.id,
-          userId: userByEmail.id,
-        },
-      });
-
+    if (userByEmail.fridgeMember) {
       return {
-        fridgeId: fridge.id,
+        fridgeId: userByEmail.fridgeMember.fridgeId,
         userId: userByEmail.id,
       };
     }
 
-    const createdUser = await transaction.user.create({
-      data: {
-        email,
-        googleId,
-        image,
-        name,
-      },
-      select: { id: true },
-    });
+    const fridgeId = await createFridgeForUser(userByEmail.id);
+    return { fridgeId, userId: userByEmail.id };
+  }
 
-    const fridge = await transaction.fridge.create({
-      data: {},
-      select: { id: true },
-    });
-
-    await transaction.storageLocation.createMany({
-      data: [
-        { fridgeId: fridge.id, name: "冷蔵庫", sortOrder: 0 },
-        { fridgeId: fridge.id, name: "冷凍庫", sortOrder: 1 },
-        { fridgeId: fridge.id, name: "常温", sortOrder: 2 },
-      ],
-    });
-
-    await transaction.fridgeMember.create({
-      data: {
-        fridgeId: fridge.id,
-        userId: createdUser.id,
-      },
-    });
-
-    return {
-      fridgeId: fridge.id,
-      userId: createdUser.id,
-    };
+  // 新規ユーザー作成
+  const createdUser = await prisma.user.create({
+    data: { email, googleId, image, name },
+    select: { id: true },
   });
+
+  const fridgeId = await createFridgeForUser(createdUser.id);
+  return { fridgeId, userId: createdUser.id };
 }
 
 export const authOptions: NextAuthOptions = {
@@ -222,12 +168,14 @@ export const authOptions: NextAuthOptions = {
         return true;
       } catch (error) {
         console.error("認証時のユーザー同期に失敗しました", error);
-        return false;
+        const message = error instanceof Error ? error.message : "Unknown error";
+        return `/login?error=SignInError&detail=${encodeURIComponent(message)}`;
       }
     },
   },
   pages: {
     signIn: "/login",
+    error: "/login",
   },
   providers: [
     GoogleProvider({
