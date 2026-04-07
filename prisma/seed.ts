@@ -1,12 +1,10 @@
 import dotenv from 'dotenv'
 import path from 'node:path'
 import { PrismaClient } from '@prisma/client'
-import { PrismaPg } from '@prisma/adapter-pg'
 
 dotenv.config({ path: path.resolve(__dirname, '..', '.env.local') })
 
-const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! })
-const prisma = new PrismaClient({ adapter })
+const prisma = new PrismaClient()
 
 /** 現在日時から指定日数後の Date を返す（負の値で過去） */
 function daysFromNow(days: number): Date {
