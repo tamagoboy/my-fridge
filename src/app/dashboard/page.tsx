@@ -142,7 +142,7 @@ export default function DashboardPage() {
               value="all"
               className="rounded-full px-8 py-4 text-base font-bold text-on-surface-variant transition-colors data-[state=active]:bg-surface-container-low data-[state=active]:text-on-surface data-[state=active]:shadow-none"
             >
-              冷蔵庫
+              すべて
             </TabsTrigger>
             {storageLocations.map((loc) => (
               <TabsTrigger

@@ -35,6 +35,7 @@ model Fridge {
   foods            Food[]
   invitations      FridgeInvitation[]
   storageLocations StorageLocation[]
+  inputHistories   InputHistory[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -110,6 +111,8 @@ model InputHistory {
   name     String
   category String?
   count    Int    @default(1)
+
+  fridge Fridge @relation(fields: [fridgeId], references: [id], onDelete: Cascade)
 
   @@unique([fridgeId, name])
   @@index([fridgeId])

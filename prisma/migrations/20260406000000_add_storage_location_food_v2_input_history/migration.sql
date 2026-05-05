@@ -37,10 +37,12 @@ CREATE INDEX "InputHistory_fridgeId_idx" ON "InputHistory"("fridgeId");
 
 -- CreateIndex
 CREATE INDEX "Food_fridgeId_storageLocationId_idx" ON "Food"("fridgeId", "storageLocationId");
-CREATE INDEX "Food_fridgeId_expiryDate_idx" ON "Food"("fridgeId", "expiryDate");
 
 -- AddForeignKey
 ALTER TABLE "StorageLocation" ADD CONSTRAINT "StorageLocation_fridgeId_fkey" FOREIGN KEY ("fridgeId") REFERENCES "Fridge"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "InputHistory" ADD CONSTRAINT "InputHistory_fridgeId_fkey" FOREIGN KEY ("fridgeId") REFERENCES "Fridge"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Food" ADD CONSTRAINT "Food_storageLocationId_fkey" FOREIGN KEY ("storageLocationId") REFERENCES "StorageLocation"("id") ON DELETE SET NULL ON UPDATE CASCADE;

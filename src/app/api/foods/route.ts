@@ -104,7 +104,9 @@ export async function POST(request: Request) {
       },
     })
 
-    await upsertInputHistory(user.fridgeId, name, category)
+    await upsertInputHistory(user.fridgeId, name, category).catch((err) => {
+      console.warn('InputHistory upsert failed:', err)
+    })
 
     return NextResponse.json(toFoodPayload(food), { status: 201 })
   } catch (error) {
@@ -112,6 +114,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: '認証が必要です' }, { status: 401 })
     }
 
-    return NextResponse.json({ message: '食材の追加に失敗しました' }, { status: 500 })
+    console.error('POST /api/foods error:', error)
+    const message = error instanceof Error ? error.message : '食材の追加に失敗しました'
+    return NextResponse.json({ message }, { status: 500 })
   }
 }

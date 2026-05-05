@@ -5,10 +5,12 @@ import { Button } from '@/components/ui/button'
 import { useStorageLocations } from '@/hooks/useFoods'
 import type { OcrResultItem } from '@/types/food'
 import { Camera, Loader2 } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import { useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 export default function ScanPage() {
+  const router = useRouter()
   const { data: storageLocations = [] } = useStorageLocations()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [preview, setPreview] = useState<string | null>(null)
@@ -38,11 +40,16 @@ export default function ScanPage() {
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.message ?? 'OCRに失敗しました')
+        throw new Error(data.message ?? `OCRに失敗しました (${response.status})`)
       }
 
-      setItems(data.items ?? [])
+      if (!data.items || data.items.length === 0) {
+        throw new Error('OCR結果が取得できませんでした。レシートをしっかり撮影してから試してください。')
+      }
+
+      setItems(data.items)
     } catch (error) {
+      console.error('OCR Error:', error)
       toast.error(error instanceof Error ? error.message : 'OCRに失敗しました')
     } finally {
       setIsScanning(false)
@@ -114,6 +121,7 @@ export default function ScanPage() {
           onConfirm={() => {
             setItems(null)
             setPreview(null)
+            router.push('/dashboard')
           }}
           onClose={() => setItems(null)}
         />

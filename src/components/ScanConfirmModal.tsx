@@ -54,7 +54,7 @@ export function ScanConfirmModal({
         i === index
           ? {
               ...item,
-              storageLocationId: storageLocationId || null,
+              storageLocationId: storageLocationId === '__unset__' ? null : storageLocationId,
               storageLocationName: location?.name ?? '',
             }
           : item
@@ -93,11 +93,18 @@ export function ScanConfirmModal({
             storageLocationId: item.storageLocationId,
           }),
         })
-        if (!res.ok) throw new Error(`${item.name}の保存に失敗しました`)
+
+        if (!res.ok) {
+          const errorData = await res.json().catch(() => ({ message: `HTTP ${res.status}` }))
+          throw new Error(
+            `${item.name}の保存に失敗しました: ${errorData.message || errorData.error || 'Unknown error'}`
+          )
+        }
       }
       toast.success(`${validItems.length}件の食材を保存しました`)
       onConfirm(validItems)
     } catch (err) {
+      console.error('Save error:', err)
       toast.error(err instanceof Error ? err.message : '保存に失敗しました')
     } finally {
       setIsSaving(false)
@@ -142,14 +149,14 @@ export function ScanConfirmModal({
 
               <div className="grid grid-cols-2 gap-2">
                 <Select
-                  value={item.storageLocationId ?? ''}
+                  value={item.storageLocationId ?? '__unset__'}
                   onValueChange={(v) => handleStorageChange(index, v)}
                 >
                   <SelectTrigger className="bg-white text-xs h-8">
                     <SelectValue placeholder="保管場所" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">未設定</SelectItem>
+                    <SelectItem value="__unset__">未設定</SelectItem>
                     {storageLocations.map((loc) => (
                       <SelectItem key={loc.id} value={loc.id}>
                         {loc.name}
